@@ -1,0 +1,33 @@
+{{- if .Values.nodepools }} {{- range $index, $nodepool := .Values.nodepools }}
+apiVersion: rke-machine-config.cattle.io/v1
+kind: HarvesterConfig
+metadata:
+  name: {{ $nodepool.name }}
+  namespace: fleet-default
+common:
+{{- if $nodepool.labels }}
+  labels:
+{{ toYaml $nodepool.labels | indent 4 }}
+{{- end }}
+{{- if $nodepool.taints }}
+  taints:
+{{ toYaml $nodepool.taints | indent 4 }}
+{{- end }}
+vmNamespace: {{ $nodepool.vmNamespace }}
+cpuCount: {{ $nodepool.cpuCount | quote }}
+diskBus: "virtio"
+diskSize: {{ $nodepool.diskSize | quote }}
+imageName: {{ $nodepool.imageName }}
+memorySize: {{ $nodepool.memorySize | quote }}
+networkModel: "virtio"
+networkName: {{ $nodepool.networkName }}
+networkType: {{ $nodepool.networkType }}
+sshUser: {{ $nodepool.sshUser }}
+{{- if $nodepool.networkData }}
+networkData: {{ $nodepool.networkData }}
+{{- end }}
+{{- if $nodepool.userData }}
+userData: {{ $nodepool.userData | b64enc }}
+{{- end }}
+{{- end }}
+{{- end }}

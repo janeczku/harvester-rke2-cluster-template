@@ -1,0 +1,45 @@
+questions:
+- variable: cluster.name
+  default: mycluster
+  description: "Specify the name of the cluster"
+  label: "Cluster Name"
+  required: true
+  type: string
+  group: "General"
+- variable: cloudCredentialSecretName
+  default: 
+  description: "CloudCredentialName for provisioning cluster"
+  label: "CloudCredential Name"
+  type: cloudcredential
+  group: "General"
+- variable: kubernetesVersion
+  default: v1.21.5+rke2r2
+  description: "Specify Kubernetes version"
+  label: "Kubernetes Version"
+  type: enum
+  required: true
+  options:
+  - v1.19.9+rke2r1
+  - v1.20.6+rke2r1
+  - v1.21.5+rke2r2
+  group: "General"
+- variable: rke.localClusterAuthEndpoint.enabled
+  default: false
+  label: "Local Auth endpoint"
+  description: "Enable local auth access endpoint"
+  type: boolean
+  group: "Auth Access Endpoint"
+  show_subquestion_if: true
+  subquestions:
+  - variable: rke.localClusterAuthEndpoint.fqdn
+    default: 
+    description: "Local auth access endpoint FQDN"
+    label: "Auth Endpoint FQDN"
+    type: hostname
+    group: "Auth Access Endpoint"
+  - variable: rke.localClusterAuthEndpoint.caCerts
+    default: 
+    label: "Auth Endpoint Cacerts"
+    description: "Local auth access endpoint CACerts"
+    type: multiline
+    group: "Auth Access Endpoint"
