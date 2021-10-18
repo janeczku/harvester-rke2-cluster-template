@@ -12,7 +12,7 @@ questions:
   label: "CloudCredential Name"
   type: cloudcredential
   group: "General"
-- variable: kubernetesVersion
+- variable: cluster.kubernetesVersion
   default: v1.21.5+rke2r2
   description: "Specify Kubernetes version"
   label: "Kubernetes Version"
@@ -23,7 +23,7 @@ questions:
   - v1.20.6+rke2r1
   - v1.21.5+rke2r2
   group: "General"
-- variable: rke.localClusterAuthEndpoint.enabled
+- variable: cluster.localClusterAuthEndpoint.enabled
   default: false
   label: "Local Auth endpoint"
   description: "Enable local auth access endpoint"
