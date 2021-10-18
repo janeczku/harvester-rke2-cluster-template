@@ -4,13 +4,23 @@ This project contains an example RKE2 cluster template helm chart, which can be 
 
 ### How to use
 
-The cluster configuration options are available through [values.yaml](./charts/values.yaml).
+See the [upstream documentation](https://rancher.com/docs/rancher/v2.6/en/admin-settings/cluster-templates/#rke2-cluster-template) on importing and using cluster templates in Rancher.
+
+This template contains several parameters that allow you to customize the cluster provisioning. These are are available through [values.yaml](./charts/values.yaml).
 
 ```yaml
+# specify cloud credential secret name
+cloudCredentialSecretName: ""
+
+# specify Rancher agent environment variables
+# agentEnvVars:
+#   - name: "HTTP_PROXY"
+#     value: "https://proxy.com"
+
 # cluster specific values
 cluster:
   # specify cluster name
-  name: cluster-example
+  name: example-cluster
 
   # specify cluster labels
   labels: {}
@@ -18,129 +28,122 @@ cluster:
   # specify cluster annotations
   annotations: {}
 
-# specify cloud credential secret name, do not need to be provided if using custom driver
-cloudCredentialSecretName: example
-
-# specify cloud provider, options are amazonec2, digitalocean, azure, vsphere or custom
-cloudprovider: ""
-
-# enable network policy
-enableNetworkPolicy: false
-
-kubernetesVersion: "v1.21.0-alpha2+rke2r1"
-
-# specify rancher helm chart values deployed into downstream cluster
-rancherValues: {}
-
-# specify extra env variables in cluster-agent deployment
-# agentEnvs:
-#  - name: HTTP_PROXY
-#     value: foo.bar
-
-# general RKE options
-rke:
-  # specify rancher helm chart values deployed into downstream cluster
-  chartValues: {}
-
-  # controlplane/etcd configuration settings
-  controlPlaneConfig:
-    # Path to the file that defines the audit policy configuration
-    # audit-policy-file: ""
-    # IPv4/IPv6 network CIDRs to use for pod IPs (default: 10.42.0.0/16)
-    # cluster-cidr: ""
-    # IPv4 Cluster IP for coredns service. Should be in your service-cidr range (default: 10.43.0.10)
-    # cluster-dns: ""
-    # Cluster Domain (default: "cluster.local")
-    # cluster-domain: ""
-    # CNI Plugin to deploy, one of none, canal, cilium (default: "canal")
-    cni: calico
-    # Do not deploy packaged components and delete any deployed components (valid items: rke2-coredns, rke2-ingress-nginx, rke2-kube-proxy, rke2-metrics-server)
-    # disable: false
-    # Disable automatic etcd snapshots
-    # etcd-disable-snapshots: false
-    # Expose etcd metrics to client interface. (Default false)
-    # etcd-expose-metrics: false
-    # Directory to save db snapshots. (Default location: ${data-dir}/db/snapshots)
-    # etcd-snapshot-dir: ""
-    # Set the base name of etcd snapshots. Default: etcd-snapshot-<unix-timestamp> (default: "etcd-snapshot")
-    # etcd-snapshot-name: ""
-    # Number of snapshots to retain (default: 5)
-    # etcd-snapshot-retention: 5
-    # Snapshot interval time in cron spec. eg. every 5 hours '* */5 * * *' (default: "0 */12 * * *")
-    # etcd-snapshot-schedule-cron: "0 */12 * * *"
-    # Customized flag for kube-apiserver process
-    # kube-apiserver-arg: ""
-    # Customized flag for kube-scheduler process
-    # kube-scheduler-arg: ""
-    # Customized flag for kube-controller-manager process
-    # kube-controller-manager-arg: ""
-    # Validate system configuration against the selected benchmark (valid items: cis-1.5, cis-1.6 )
-    # profile: "cis-1.6"
-    # Enable Secret encryption at rest
-    # secrets-encryption: false
-    # IPv4/IPv6 network CIDRs to use for service IPs (default: 10.43.0.0/16)
-    # service-cidr: "10.43.0.0/16"
-    # Port range to reserve for services with NodePort visibility (default: "30000-32767")
-    # service-node-port-range: "30000-32767"
-    # Add additional hostnames or IPv4/IPv6 addresses as Subject Alternative Names on the server TLS cert
-    # tls-san: []
-
-  # worker configuration settings
-  workerConfig:
-  - config:
-      # Node name
-      # node-name: ""
-      # Disable embedded containerd and use alternative CRI implementation
-      # container-runtime-endpoint: ""
-      # Override default containerd snapshotter (default: "overlayfs")
-      # snapshotter: ""
-      # IP address to advertise for node
-      # node-ip: "1.1.1.1"
-      # Kubelet resolv.conf file
-      # resolv-conf: ""
-      # Customized flag for kubelet process
-      # kubelet-arg: ""
-      # Customized flag for kube-proxy process
-      # kube-proxy-arg: ""
-      # Kernel tuning behavior. If set, error if kernel tunables are different than kubelet defaults. (default: false)
-      # protect-kernel-defaults: false
-      # Enable SELinux in containerd (default: false)
-      # selinux: true
-      # Cloud provider name
-      # cloud-provider-name: ""
-      # Cloud provider configuration file path
-      # cloud-provider-config: ""
-    machineLabelSelector:
-      matchLabels:
-        foo: bar
-
+  # kubernetesVersion: ""
+  defaultPodSecurityPolicyTemplateName: unrestricted
+  
   # enable local auth endpoint
   localClusterAuthEndpoint: 
     enabled: false
-  # specify fqdn of local access endpoint
   # fqdn: foo.bar.example
-  # specify cacert of local access endpoint
   # caCerts: ""
 
-  # Specify upgrade options
-  upgradeStrategy: 
-    controlPlaneDrainOptions: 
-      enabled: false
-      # deleteEmptyDirData: false
-      # disableEviction: false
-      # gracePeriod: 0
-      # ignoreErrors: false
-      # skipWaitForDeleteTimeoutSeconds: 0
-      # timeout: 0
-    workerDrainOptions:
-      enabled: false
-      # deleteEmptyDirData: false
-      # disableEviction: false
-      # gracePeriod: 0
-      # ignoreErrors: false
-      # skipWaitForDeleteTimeoutSeconds: 0
-      # timeout: 0
-    workerConcurrency: "1"
+# specify user principal ids to be assiged as cluster members
+# clusterMembers: 
+# - principalName: "local://u-z8zl5"
+#   roleTemplateName: "cluster-member"
+
+# Cloud Provider Config contains the Kubeconfig configuration
+# to use for the Harvester Cloud Provider
+# It can be obtained like so:
+# curl 'https://<RANCHER-SERVER>/k8s/clusters/c-m-hswtcmdj/v1/harvester/kubeconfig' \
+#   -H 'Content-Type: application/json;charset=UTF-8' \
+#   -H 'Accept: application/json' \
+#   --data-raw '{"clusterRoleName":"harvesterhci.io:cloudprovider","namespace":"<VM NAMESPACE>","serviceAccountName":"<CLUSTERNAME>"}' \
+#   --insecure \
+#   -u <APIKEY>:<APISECRET>
+
+# cloudProviderConfig: "apiVersion: v1\nclusters:\n- cluster:\n    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ...IENFUlRJRklDQVRFLS0tLS0K\n    server: https://192.168.32.21:6443\n  name: default\ncontexts:\n- context:\n    cluster: default\n    namespace: user-mf9ss\n    user: default\n  name: default\ncurrent-context: default\nkind: Config\npreferences: {}\nusers:\n- name: default\n  user:\n    token: eyJhbGciOiJSUzI1NiIsImtpZCI...1aIWxYpDig\n"
+
+# Specify nodepool options. Can add multiple node groups, specify etcd, controlplane and worker roles.
+nodepools:
+- name: master-pool-1
+  etcd: true
+  controlplane: true
+  worker: true
+  # specify node labels
+  labels: {}
+  # specify node taints
+  taints: {}
+  # specify nodepool size
+  quantity: 1
+  # Pause node pool
+  paused: false
+  # specify displayName
+  displayName: "Master Pool 1"
+  # specify rolling update mechanism
+  # rollingUpdate:
+  #   The maximum number of machines that can be unavailable during the update.
+  #   Value can be an absolute number (ex: 5) or a percentage of desired
+  #   machines (ex: 10%).
+  #   Absolute number is calculated from percentage by rounding down.
+  #   This can not be 0 if MaxSurge is 0.
+  #   Defaults to 0.
+  #   Example: when this is set to 30%, the old MachineSet can be scaled
+  #   down to 70% of desired machines immediately when the rolling update
+  #   starts. Once new machines are ready, old MachineSet can be scaled
+  #   down further, followed by scaling up the new MachineSet, ensuring
+  #   that the total number of machines available at all times
+  #   during the update is at least 70% of desired machines.
+  #   maxUnavailable: "5"
+  #   The maximum number of machines that can be scheduled above the
+  #   desired number of machines.
+  #   Value can be an absolute number (ex: 5) or a percentage of
+  #   desired machines (ex: 10%).
+  #   This can not be 0 if MaxUnavailable is 0.
+  #   Absolute number is calculated from percentage by rounding up.
+  #   Defaults to 1.
+  #   Example: when this is set to 30%, the new MachineSet can be scaled
+  #   up immediately when the rolling update starts, such that the total
+  #   number of old and new machines do not exceed 130% of desired
+  #   machines. Once old machines have been killed, new MachineSet can
+  #   be scaled up further, ensuring that total number of machines running
+  #   at any time during the update is at most 130% of desired machines.
+  #   maxSurge: "1"
+
+  # specify machineDeployment Labels
+  # machineDeploymentLabels: {}
+
+  # specify machineDeployment annotations
+  # machineDeploymentAnnotations: {}
+
+  # VM Image reference, <namespace/name>
+  imageName: "default/image-pc6x9"
+
+  # VM CPU Count
+  cpuCount: 2
+
+  # VM Memory in GB
+  memorySize: 4
+
+  # VM disk size in GB
+  diskSize: 40
+
+  # Virtual network name reference, <namespace/name>
+  networkName: "default/vlan-40"
+
+  # Network IPAM type
+  networkType: dhcp
+
+  # SSH username
+  sshUser: root
+
+  # VM namespace
+  vmNamespace: "default"
+
+  # File contents for userdata
+  # userData: |-
+  #   #cloud-config
+  #   package_upgrade: true
+
+  # File contents for network data
+  # networkData: |-
+  #   version: 2
+  #   ethernets:
+  #     eth0:
+  #       dhcp4: true
+  #       addresses: [ fd10:0:2::2/120 ]
+  #       gateway6: fd10:0:2::1
+
 ```
 
 To provide your own configuration, modify the original values.yaml and create your own version, and pass it to helm. For example:
