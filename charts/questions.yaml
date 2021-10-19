@@ -6,12 +6,6 @@ questions:
   required: true
   type: string
   group: "General"
-- variable: cloudCredentialSecretName
-  default: 
-  description: "CloudCredentialName for provisioning cluster"
-  label: "CloudCredential Name"
-  type: cloudcredential
-  group: "General"
 - variable: cluster.kubernetesVersion
   default: v1.21.5+rke2r2
   description: "Specify Kubernetes version"
