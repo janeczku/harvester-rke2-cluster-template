@@ -1,5 +1,5 @@
 # specify cloud credential secret name
-cloudCredentialSecretName: ""
+cloudCredentialSecretName: "cattle-global-data:cc-tndb6"
 
 # specify Rancher agent environment variables
 # agentEnvVars:
